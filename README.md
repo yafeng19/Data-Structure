@@ -3,4 +3,4 @@ This is a repository for the course ***Data Structure***, which is used as the s
 
 - reference book: *Data Structure* (C language version), published by Tsinghua University Press 
 
-Thank you for visit this repository. Any comments and suggestions are welcome.
+Thank you for visiting this repository. Any comments and suggestions are welcome.
