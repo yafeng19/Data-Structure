@@ -1,3 +1,8 @@
+/**
+ * 第2章 线性表 
+ * 2-1 线性表的顺序实现
+ * 2020-09-21*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #define LIST_INIT_SIZE 100  //线性表存储空间的初始分配量
@@ -30,7 +35,7 @@ bool InitList(SqList &L) //构造一个空线性表L
     L.listsize = LIST_INIT_SIZE;
     return true;
 }
-bool ClearList(SqList &L) //销毁线性表L
+bool ClearList(SqList &L) //清空线性表L
 {
     L.length = 0;
     return true;
@@ -257,7 +262,7 @@ int main()
                         printf("线性表销毁成功\n");
                         break;}
                     case 10: {
-                        if(L.length==0)
+                        if(ListEmpty(L))
                             printf("线性表为空\n");
                         else
                         {
