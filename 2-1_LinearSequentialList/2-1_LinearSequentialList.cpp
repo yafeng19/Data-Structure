@@ -44,6 +44,7 @@ bool DestroyList(SqList &L) //销毁线性表L
 }
 bool ListEmpty(SqList L) //判断线性表L是否为空
 {
+    //也可以写成 return (L.length == 0);
     if(L.length == 0)
         return true;
     else 
@@ -240,7 +241,10 @@ int main()
                         printf("请输入删除第几个数据\n");
                         scanf("%d", &delete_i);
                         if(ListDelete(L, delete_i, element))
-                            printf("删除成功\n");
+                        {
+                            printf("删除成功,被删除的数据为：\n");
+                            printf("%s %d %c %.2f\n", element.name, element.age, element.sex, element.score);
+                        }
                         else 
                             printf("删除失败\n");
                         break;}
