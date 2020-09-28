@@ -1,7 +1,7 @@
 /**
  * 第2章 线性表 
- * 2-2 线性表的链式实现
- * 2020-09-23*/
+ * 2-3 双向链表的应用
+ * 2020-09-28*/
 
 
 #include <stdio.h>
@@ -16,51 +16,56 @@ typedef struct
     char sex;
     float score;
 }ElemType;
-typedef struct LNode
+typedef struct DuLNode
 {
     ElemType data;  //数据域
-    struct LNode *next; //指针域
-}LNode, *LinkList;
+    struct DuLNode *prior;    //指针域，前驱指针
+    struct DuLNode *next;     //指针域，后继指针
+}DuLNode, *DuLinkList;
 
 
-bool InitList(LinkList &L) //构造一个带有头结点的空线性表L
+bool InitList(DuLinkList &L) //构造一个带有头结点的空线性表L
 {
-    L = (LNode *)malloc(sizeof(LNode));
+    L = (DuLNode *)malloc(sizeof(DuLNode));
     if(!L) //申请内存失败，L为NULL
     {
         printf("内存申请失败，程序异常终止\n");
         exit(OVERFLOW);
     }
+    L->prior == NULL;
     L->next == NULL;
     return true;
 }
-void CreateList_head(LinkList &L, int n) //头插法，逆序输入
+void CreateList_head(DuLinkList &L, int n) //头插法，逆序输入
 {
     InitList(L);    //先建立一个带头结点的空链表
     for(int i = n; i > 0; i--)
     {
-        LinkList p = (LNode *)malloc(sizeof(LNode));
+        DuLinkList p = (DuLNode *)malloc(sizeof(DuLNode));
         scanf("%s %d %c %f", &((p->data).name), &((p->data).age), &((p->data).sex), &((p->data).score));
         p->next = L->next;
+        p->prior = L;
+        L->next->prior = p;
         L->next = p;
     }
 }
-void CreateList_tail(LinkList &L, int n) //尾插法，顺序输入
+void CreateList_tail(DuLinkList &L, int n) //尾插法，顺序输入
 {
     InitList(L);    //先建立一个带头结点的空链表
-    LinkList r = L;
+    DuLinkList r = L;
     for(int i = n; i > 0; i--)
     {
-        LinkList p = (LNode *)malloc(sizeof(LNode));
+        DuLinkList p = (DuLNode *)malloc(sizeof(DuLNode));
         scanf("%s %d %c %f", &((p->data).name), &((p->data).age), &((p->data).sex), &((p->data).score));
         r->next = p;
+        p->prior = r;
         r = p;
         r->next = NULL; //保证尾结点指针域为空
     }
 }
-bool ClearList(LinkList &L) //清空线性表L，即重置为空链表（只含有一个空结点）
+bool ClearList(DuLinkList &L) //清空线性表L，即重置为空链表（只含有一个空结点）
 {
-    LinkList p;
+    DuLinkList p;
     while(L->next)
     {
         p = L->next;
@@ -69,13 +74,12 @@ bool ClearList(LinkList &L) //清空线性表L，即重置为空链表（只含�
     }
     return true;
 }
-bool DestroyList(LinkList &L) //销毁线性表L，即不再保留空链表
+bool DestroyList(DuLinkList &L) //销毁线性表L，即不再保留空链表
 {
     free(L);
-    L = NULL;
     return true;
 }
-bool ListEmpty(LinkList L) //判断线性表L是否为空
+bool ListEmpty(DuLinkList L) //判断线性表L是否为空
 {
     //也可以写成 return (L == NULL || L->next == NULL);
     if(L == NULL || L->next == NULL)    //被销毁或者为空表
@@ -83,12 +87,12 @@ bool ListEmpty(LinkList L) //判断线性表L是否为空
     else 
         return false;
 }
-int ListLength(LinkList L)   //求线性表L的长度
+int ListLength(DuLinkList L)   //求线性表L的长度
 {
     int length = 0;
     if(L == NULL)   //被销毁
         return false;
-    LinkList p = L->next;
+    DuLinkList p = L->next;
     while(p)
     {
         length++;
@@ -96,18 +100,40 @@ int ListLength(LinkList L)   //求线性表L的长度
     }
     return length;
 }
-void DisplayList(LinkList L)
+void DisplayList(DuLinkList L)
 {
-    LinkList p = L->next;
+    DuLinkList p = L->next;
     while(p)
     {
         printf("%s %d %c %.2f\n", (p->data).name, (p->data).age, (p->data).sex, (p->data).score);
         p = p->next;
     }
 }
-bool NextElem(LinkList L, int cur_e, ElemType &next_e)    //求后继的值，可输入位置0到length-1
+bool PriorElem(DuLinkList L, int cur_e, ElemType &pre_e)    //求前驱的值，可输入位置2到length+1
 {
-    LinkList p = L;
+    DuLinkList p = L->next;
+    int j = 1;
+    while(p->prior && p->next && j < cur_e) //由于求前驱，故要求p->prior不空。向后遍历要求p->next不空。j = cur_e时则取出在第i个结点的前驱e
+    {
+        p = p->next;
+        j++;
+    }
+    if (!(p->prior) || j > cur_e || cur_e == 1) //位置为1时不能求其前驱
+        return false;
+    if(!(p->next)) //位置为length+1时
+    {
+        pre_e = p->data;
+        return true;
+    }
+    else
+    {
+        pre_e = p->prior->data;
+        return true;
+    }
+}
+bool NextElem(DuLinkList L, int cur_e, ElemType &next_e)    //求后继的值，可输入位置0到length-1
+{
+    DuLinkList p = L;
     int j = 0;
     while(p->next && j < cur_e) //由于求后继，故要求p->next不空。j = cur_e时则取出在第i个结点的后继元素e
     {
@@ -119,9 +145,9 @@ bool NextElem(LinkList L, int cur_e, ElemType &next_e)    //求后继的值，�
     next_e = p->next->data;
     return true;
 }
-bool GetElem(LinkList L, int i, ElemType &e)  //取第i个位置的值，时间复杂度O(ListLength(L))
+bool GetElem(DuLinkList L, int i, ElemType &e)  //取第i个位置的值，时间复杂度O(ListLength(L))
 {
-    LinkList p = L->next;
+    DuLinkList p = L->next;
     int j = 0;
     while(p && j < i-1) //j = i-1时则取出在第i个结点的元素e
     {
@@ -133,38 +159,40 @@ bool GetElem(LinkList L, int i, ElemType &e)  //取第i个位置的值，时间�
     e = p->data;
     return true;
 }
-bool ListInsert(LinkList &L, int i, ElemType e)   //在第i个位置前插入元素e，时间复杂度O(ListLength(L))
+bool ListInsert(DuLinkList &L, int i, ElemType e)   //在第i个位置前插入元素e，时间复杂度O(ListLength(L))
 {
-    LinkList p = L;
+    DuLinkList p = L;
     int j = 0;
-    while(p && j < i-1) //j = i-1时则在第i个结点前插入元素e
+    while(p && j < i) //j = i时则在第i个结点前插入元素e
     {
         p = p->next;
         j++;
     }
-    if (!p || j > i-1)
+    if (!p || j > i)
         return false;
-    LinkList s = (LNode *)malloc(sizeof(LNode));
+    DuLinkList s = (DuLNode *)malloc(sizeof(DuLNode));
     s->data = e;
-    s->next = p->next;
-    p->next = s;
+    s->prior = p->prior;
+    s->next = p;
+    p->prior->next = s;
+    p->prior = s;
     return true;
 }
-bool ListDelete(LinkList &L, int i, ElemType &e)  //删除第i个位置的元素，时间复杂度O(ListLength(L))
+bool ListDelete(DuLinkList &L, int i, ElemType &e)  //删除第i个位置的元素，时间复杂度O(ListLength(L))
 {
-    LinkList p = L, q = NULL;
+    DuLinkList p = L;
     int j = 0;
-    while(p->next && j < i-1)   //p的后继代表要删除的元素，因此p->next不能为空。 j = i-1时则删除第i个结点
+    while(p->next && j < i)   //p的后继代表要删除的元素，因此p->next不能为空。 j = i时则删除第i个结点
     {
         p = p->next;
         j++;
     }
-    if (!(p->next) || j > i-1)
+    if (!(p->next) || j > i)
         return false;
-    q = p->next;
-    p->next = q->next;
-    e = q->data;
-    free(q);
+    e = p->data;
+    p->prior->next = p->next;
+    p->next->prior = p->prior;
+    free(p);
     return true;
 }
 
@@ -182,7 +210,7 @@ int main()
     }
     else
     {
-        LinkList L;
+        DuLinkList L;
         printf("请输入选择顺序显示还是逆序显示：  1.顺序显示\t2.逆序显示\n");
         scanf("%d", &order);
         if(order == 1|| order == 2)
@@ -201,8 +229,8 @@ int main()
             printf("信息录入完毕，请输入数字代码以选择操作：\n");
             while(oper != 0)
             {
-                printf("\n 0.退出程序\n 1.判断线性表是否为空\n 2.求线性表的长度\n 3.求后继数据\n 4.取第i个数据\n");
-                printf(" 5.在第i个数据前插入数据\n 6.删除第i个数据\n 7.清空线性表\n 8.销毁线性表\n 9.展示线性表\n");
+                printf("\n 0.退出程序\n 1.判断线性表是否为空\n 2.求线性表的长度\n 3.求前驱数据\n 4.求后继数据\n 5.取第i个数据\n");
+                printf(" 6.在第i个数据前插入数据\n 7.删除第i个数据\n 8.清空线性表\n 9.销毁线性表\n 10.展示线性表\n");
                 scanf("%d", &oper);
                 switch(oper)
                 {
@@ -224,7 +252,7 @@ int main()
                         int cur_i;
                         printf("请输入要查找的数据位置\n");
                         scanf("%d", &cur_i);
-                        if(NextElem(L, cur_i, element))
+                        if(PriorElem(L, cur_i, element))
                         {
                             printf("查找成功，数据信息如下：\n");
                             printf("%s %d %c %.2f", element.name, element.age, element.sex, element.score);
@@ -237,6 +265,19 @@ int main()
                         int cur_i;
                         printf("请输入要查找的数据位置\n");
                         scanf("%d", &cur_i);
+                        if(NextElem(L, cur_i, element))
+                        {
+                            printf("查找成功，数据信息如下：\n");
+                            printf("%s %d %c %.2f", element.name, element.age, element.sex, element.score);
+                        }
+                        else 
+                            printf("查找失败\n");
+                        break;}
+                    case 5: {
+                        ElemType element;
+                        int cur_i;
+                        printf("请输入要查找的数据位置\n");
+                        scanf("%d", &cur_i);
                         if(GetElem(L, cur_i, element))
                         {
                             printf("查找成功，数据信息如下：\n");
@@ -245,7 +286,7 @@ int main()
                         else 
                             printf("查找失败\n");
                         break;}
-                    case 5: 
+                    case 6: 
                     {
                         ElemType element;
                         int insert_i;
@@ -258,7 +299,7 @@ int main()
                         else
                             printf("插入失败\n");
                         break;}
-                    case 6: {
+                    case 7: {
                         ElemType element;
                         int delete_i;
                         printf("请输入删除第几个数据\n");
@@ -271,15 +312,15 @@ int main()
                         else 
                             printf("删除失败\n");
                         break;}
-                    case 7: {
+                    case 8: {
                         ClearList(L);
                         printf("线性表清空成功\n");
                         break;}
-                    case 8: {
+                    case 9: {
                         DestroyList(L);
                         printf("线性表销毁成功\n");
                         break;}
-                    case 9: {
+                    case 10: {
                         if(ListEmpty(L))
                             printf("线性表为空\n");
                         else
