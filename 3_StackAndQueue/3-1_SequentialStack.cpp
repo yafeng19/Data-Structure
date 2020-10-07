@@ -1,32 +1,33 @@
 /**
  * 第3章 栈和队列
  * 3-1 栈的顺序实现
- * 2020-09-30 */
+ * 2020-09-30 
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #define STACK_INIT_SIZE 100 //栈容量
 #define STACKINCREMENT 10   //栈顶指针
-#define OVERFLOW 1 //宏定义:失败
+#define OVERFLOW 1          //宏定义:失败
 
 typedef struct
 {
-    char name[15]; 
+    char name[15];
     int age;
     char sex;
     float score;
-}SElemType;
+} SElemType;
 typedef struct
 {
     SElemType *base; //基地址
-    SElemType *top; //栈顶指针
-    int stacksize;  //栈容量
-}SqStack;
+    SElemType *top;  //栈顶指针
+    int stacksize;   //栈容量
+} SqStack;
 
-
-bool InitStack(SqStack &S){
-    S.base = (SElemType *)malloc(STACK_INIT_SIZE*sizeof(SElemType));
-    if(!S.base)
+bool InitStack(SqStack &S)
+{
+    S.base = (SElemType *)malloc(STACK_INIT_SIZE * sizeof(SElemType));
+    if (!S.base)
     {
         printf("内存申请失败，程序异常终止\n");
         exit(OVERFLOW);
@@ -37,10 +38,10 @@ bool InitStack(SqStack &S){
 }
 bool Push(SqStack &S, SElemType e)
 {
-    if(S.top - S.base >= S.stacksize)
+    if (S.top - S.base >= S.stacksize)
     {
-        S.base = (SElemType *)realloc(S.base, (S.stacksize + STACKINCREMENT)*sizeof(SElemType));
-        if(!S.base)
+        S.base = (SElemType *)realloc(S.base, (S.stacksize + STACKINCREMENT) * sizeof(SElemType));
+        if (!S.base)
         {
             printf("内存申请失败，程序异常终止\n");
             exit(OVERFLOW);
@@ -48,13 +49,13 @@ bool Push(SqStack &S, SElemType e)
         S.top = S.base + S.stacksize;
         S.stacksize += STACKINCREMENT;
     }
-    *S.top = e;     //以下两行可以写成 *S.top++ = e;
-    S.top++; 
+    *S.top = e; //以下两行可以写成 *S.top++ = e;
+    S.top++;
     return true;
 }
 bool Pop(SqStack &S, SElemType &e)
 {
-    if(S.top == S.base)
+    if (S.top == S.base)
         return false;
     else
     {
@@ -78,9 +79,9 @@ bool ClearStack(SqStack &S)
 }
 bool StackEmpty(SqStack S)
 {
-    if(S.top == S.base)
+    if (S.top == S.base)
         return true;
-    else 
+    else
         return false;
 }
 int StackLength(SqStack S)
@@ -89,7 +90,7 @@ int StackLength(SqStack S)
 }
 bool GetTop(SqStack S, SElemType &e)
 {
-    if(S.top == S.base)
+    if (S.top == S.base)
         return false;
     else
     {
@@ -97,7 +98,6 @@ bool GetTop(SqStack S, SElemType &e)
         return true;
     }
 }
-
 
 int main()
 {

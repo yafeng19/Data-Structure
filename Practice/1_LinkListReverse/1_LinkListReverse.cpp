@@ -1,6 +1,7 @@
 /**
  * 练习1 
- * 链表的就地逆置 */
+ * 链表的就地逆置 
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

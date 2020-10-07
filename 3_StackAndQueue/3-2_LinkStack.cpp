@@ -1,7 +1,8 @@
 /**
  * 第3章 栈和队列
  * 3-2 栈的链式实现
- * 2020-09-30 */
+ * 2020-09-30 
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,21 +10,21 @@
 
 typedef struct
 {
-    char name[15]; 
+    char name[15];
     int age;
     char sex;
     float score;
-}SElemType;
+} SElemType;
 typedef struct SNode
 {
     SElemType data;     //数据域
     struct SNode *next; //链域
-}SNode, *LinkStack;
+} SNode, *LinkStack;
 
-
-bool InitStack(LinkStack &S){
+bool InitStack(LinkStack &S)
+{
     S = (SNode *)malloc(sizeof(SNode));
-    if(!S)
+    if (!S)
     {
         printf("内存申请失败，程序异常终止\n");
         exit(OVERFLOW);
@@ -31,7 +32,7 @@ bool InitStack(LinkStack &S){
     S->next = NULL;
     return true;
 }
-bool Push(LinkStack &S, SElemType e)    //与单链表的头插法操作方式一致
+bool Push(LinkStack &S, SElemType e) //与单链表的头插法操作方式一致
 {
     LinkStack p = (SNode *)malloc(sizeof(SNode));
     p->data = e;
@@ -41,7 +42,7 @@ bool Push(LinkStack &S, SElemType e)    //与单链表的头插法操作方式�
 }
 bool Pop(LinkStack &S, SElemType &e)
 {
-    if(S->next == NULL)
+    if (S->next == NULL)
         return false;
     else
     {
@@ -61,27 +62,27 @@ bool DestroyStack(LinkStack &S)
 }
 bool ClearStack(LinkStack &S)
 {
-    while(!StackEmpty(S))
+    while (!StackEmpty(S))
     {
-        SElemType e ;
+        SElemType e;
         Pop(S, e);
     }
     return true;
 }
 bool StackEmpty(LinkStack S)
 {
-    if(S == NULL || S->next == NULL)
+    if (S == NULL || S->next == NULL)
         return true;
-    else 
+    else
         return false;
 }
 int StackLength(LinkStack S)
 {
     int length = 0;
-    if(S == NULL)   //被销毁
+    if (S == NULL) //被销毁
         return false;
     LinkStack p = S->next;
-    while(p)
+    while (p)
     {
         length++;
         p = p->next;
@@ -90,7 +91,7 @@ int StackLength(LinkStack S)
 }
 bool GetTop(LinkStack S, SElemType &e)
 {
-    if(!StackEmpty(S))
+    if (!StackEmpty(S))
         return false;
     else
     {
@@ -98,7 +99,6 @@ bool GetTop(LinkStack S, SElemType &e)
         return true;
     }
 }
-
 
 int main()
 {
