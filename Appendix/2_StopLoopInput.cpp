@@ -9,7 +9,7 @@ int main()
     {
         scanf("%d", &a[i]);
         i++;
-    } while (getchar() != '\n');
+    } while (getchar() != '\n'); //输入回车跳出循环输入
     i = 0;
     while (a[i] != '\0')
     {
