@@ -1,11 +1,10 @@
 /**
- * 实验1 
+ * 实验1 一元多项式的求导
  * 2020-10-17
  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#define OVERFLOW 1 //宏定义:失败
 
 typedef struct
 {
@@ -24,7 +23,7 @@ bool InitPolyn(Polynomial &P) //构造一个带有头结点的空线性表L
     if (!P) //申请内存失败，L为NULL
     {
         printf("内存申请失败，程序异常终止\n");
-        exit(OVERFLOW);
+        exit(1);
     }
     P->next = NULL;
     return true;
@@ -42,8 +41,8 @@ void CreatePolyn(Polynomial &P) //尾插法，顺序输入
         r->next = NULL; //保证尾结点指针域为空
     } while (getchar() != '\n');
 }
-void Derivative(Polynomial &P)
-{ //求导函数
+void Derivative(Polynomial &P) //求导函数
+{
     Polynomial p = P->next;
     while (p->next)
     {
