@@ -1,6 +1,7 @@
 /**
  * 实验2 二叉树的深度
  * 2020-10-17
+ * 参考：https://www.cnblogs.com/laysfq/p/10041789.html
  */
 
 #include <iostream>

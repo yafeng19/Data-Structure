@@ -138,3 +138,76 @@ void CrtExptree(BiTree &T, char exp[])
         Pop(PTR, T);
     }
 }
+
+typedef struct QNode
+{
+    char data;          //数据域
+    struct QNode *next; //链域
+} QNode, *QueuePtr;
+typedef struct
+{
+    QueuePtr front; //队头指针
+    QueuePtr rear;  //队尾指针
+} Queue;
+
+bool InitQueue(Queue &Q)
+{
+    Q.front = Q.rear = (QNode *)malloc(sizeof(QNode));
+    if (!Q.front)
+        exit(1);
+    Q.front->next = NULL;
+    return true;
+}
+bool QueueEmpty(Queue Q)
+{
+    if (Q.front == Q.rear)
+        return true;
+    else
+        return false;
+}
+bool EnQueue(Queue &Q, char e) //插入元素e为Q的新的队尾元素
+{
+    QueuePtr p = (QNode *)malloc(sizeof(QNode));
+    if (!p)
+        exit(1);
+    p->data = e;
+    p->next = NULL;
+    Q.rear->next = p;
+    Q.rear = p;
+    return true;
+}
+bool DeQueue(Queue &Q, char &e) //取出Q的队首元素e
+{
+    if (QueueEmpty(Q))
+        return false;
+    QueuePtr p = (QNode *)malloc(sizeof(QNode));
+    p = Q.front->next;
+    e = p->data;
+    Q.front->next = p->next;
+    if (Q.rear == p) //防止删除p节点时尾指针变为野指针
+        Q.rear = Q.front;
+    free(p);
+    return true;
+}
+void visit(char name)
+{
+    printf("%c", name);
+}
+//利用队列对二叉树进行层次遍历
+bool LevelOrderTraverse(BiTree T)
+{
+    Queue Q;
+    BiTree E;
+    InitQueue(Q);
+    if (T)
+        EnQueue(Q, T->data);
+    while (!(QueueEmpty(Q)))
+    {
+        DeQueue(Q, E->data);
+        visit(E->data);
+        if (E->lchild)
+            EnQueue(Q, E->lchild->data);
+        if (E->rchild)
+            EnQueue(Q, E->rchild->data);
+    }
+}
