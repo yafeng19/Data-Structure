@@ -47,7 +47,15 @@ BiTNode *Pop(Stack &S) //出栈操作
     free(p);
     return t;
 }
-
+void PrintStack(Stack &S)
+{
+    Stack p = S->next;
+    while (p->next)
+    {
+        printf("%c ", p->data->data.TreeName);
+    }
+    printf("%c", p->data->data.TreeName);
+}
 //先序遍历算法的递归描述
 void Preorder(BiTree T, void (*visit)(ElemType &e))
 {
@@ -181,4 +189,20 @@ void CrtSubtree(BiTree &T, char c)
     Pop(S);
     T->lchild = lc;
     Push(S, T);
+}
+
+//输出二叉树上所有从根到叶子结点的路径
+void AllPath(BiTree T, Stack &S)
+{
+    if (T)
+    {
+        Push(S, T);
+        if (!T->lchild && !T->rchild)
+            PrintStack(S);
+        else
+        {
+            AllPath(T->lchild, S);
+            AllPath(T->rchild, S);
+        }
+    }
 }
