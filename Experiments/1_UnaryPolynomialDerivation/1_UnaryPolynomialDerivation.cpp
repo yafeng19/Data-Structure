@@ -1,6 +1,6 @@
 /**
  * 实验1 一元多项式的求导
- * 2020-10-17
+ * 2020-10-24
  */
 
 #include <stdio.h>
@@ -57,27 +57,25 @@ void Derivative(Polynomial &P) //求导函数
 void DisplayPolyn(Polynomial P)
 {
     Polynomial p = P->next;
-    while (p->next)
+    if (P->next->data.expn) //如果输入的多项式不是一项常数项
     {
-        if (!(P->next->data.expn)) //如果首项系数为0，则多项式为0
-        {
-            printf("%d %d ", p->data.coef, p->data.expn); //输出0 0
-            exit(0);
-        }
-        else
+        while (p->next)
         {
             if (p->data.coef) //如果系数等于0就不显示
                 printf("%d %d ", p->data.coef, p->data.expn);
             p = p->next;
         }
+        if (p->data.coef)                                  //如果系数等于0就不显示
+            printf("%d %d\n", p->data.coef, p->data.expn); //最后一项
     }
-    if (p->data.coef)                                  //如果系数等于0就不显示
-        printf("%d %d\n", p->data.coef, p->data.expn); //最后一项
+    else
+    {
+        printf("%d %d\n", p->data.coef, p->data.expn); //如果只有一项常数项，求导后输出0 0
+    }
 }
 int main()
 {
     Polynomial P;
-    printf("请按照指数递减的次序依次输入多项式的项的系数与指数：\n");
     CreatePolyn(P);
     Derivative(P);
     DisplayPolyn(P);
