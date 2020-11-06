@@ -74,31 +74,16 @@ bool DeQueue(Queue &Q, int &e) //取出Q的队首元素e
     free(p);
     return true;
 }
-int FirstAdjvex(ALGraph G, int u) //求第一个边表结点序号
-{
-    return G.vertices[u].firstedge->adjvertex;
-}
-int NextAdjvex(ALGraph G, int u, int w) //求下一个边表结点序号
-{
-    struct EdgeNode *p = (struct EdgeNode *)malloc(sizeof(struct EdgeNode));
-    p = G.vertices[u].firstedge; //从u结点开始遍历
-    while (p)                    //p结点不空
-    {
-        if (p->adjvertex != w) //找到w结点
-            p = p->nextedge;
-    }
-    if (p->nextedge) //p的下一结点不空返回w结点的下一元素
-        return p->nextedge->adjvertex;
-    else //否则返回0
-        return 0;
-}
 void ALGraphStorage(ALGraph &G, int first, int second) //图的构建
 {
     //顶点表中顶点为0，说明未添加过该节点，需要更新顶点表
     if (!G.vertices[first].vertex)
     {
         G.vertices[first].vertex = first;
-        G.vertices[first].firstedge->adjvertex = second;
+        struct EdgeNode *p = (struct EdgeNode *)malloc(sizeof(struct EdgeNode));
+        p->adjvertex = second;
+        p->nextedge = NULL;
+        G.vertices[first].firstedge = p;
     }
     //顶点表中顶点非0，说明已经添加过该节点，只需在其边表后添加新的邻接结点
     else
@@ -116,41 +101,41 @@ void ALGraphStorage(ALGraph &G, int first, int second) //图的构建
 }
 float BFSTraverse(ALGraph G, int vertex) //广度优先遍历
 {
-    int visited[MAX_NUM];
-    int v, u, w;      //v代表遍历结点序号，u代表当前结点序号
-    int count = 0;    //记录广度优先遍历的扩展次数
-    int visitsum = 0; //六次扩展内访问到的节点总数
-    Queue Q;          //定义辅助队列
+    int visited[MAX_NUM]; //0号结点不使用
+    int v;                //用于遍历结点
+    int level = 0;        //记录广度优先遍历的扩展层数
+    int count = 1;        //记录六次扩展内访问到结点总数
+    int last = vertex;    //记录每一层最后遍历的元素
+    int tail;             //记录上次遍历的元素
+    struct EdgeNode *p = (struct EdgeNode *)malloc(sizeof(struct EdgeNode));
+    Queue Q; //定义辅助队列
     for (v = 0; v <= G.vertexnum; v++)
         visited[v] = 0; //初始化访问标志
     InitQueue(Q);
-    v = vertex;        //最初广度优先遍历结点为vertex,且0号结点不使用
-    while (count <= 6) //要在六次扩展后结束
+    visited[vertex] = 1;
+    EnQueue(Q, vertex); //将最初广度优先遍历结点入队
+    while (!QueueEmpty(Q))
     {
-        if (!visited[v]) //对于尚未访问的结点
-        {
-            visited[v] = 1;
-            EnQueue(Q, v); //将该结点入队列
-            while (!QueueEmpty(Q))
+        DeQueue(Q, v); //队头元素出队列并置为v
+        for (p = G.vertices[v].firstedge; p != NULL; p = p->nextedge)
+            if (!visited[p->adjvertex])
             {
-                DeQueue(Q, u); //队头元素出队列并置为u
-                for (w = FirstAdjvex(G, u); w != 0; w = NextAdjvex(G, u, w))
-                    if (!visited[w])
-                    {
-                        visited[w] = 1;
-                        EnQueue(Q, w); //  访问的顶点w入队列
-                    }
+                visited[p->adjvertex] = 1;
+                EnQueue(Q, p->adjvertex); //  访问的顶点p->adjvertex入队列
                 count++;
+                tail = p->adjvertex;
             }
+        if (v == last)
+        {
+            level++;     //层数加1
+            last = tail; //更新一层最后遍历的元素
         }
-        v = (v + 1 <= G.vertexnum ? v + 1 : (v + 1) % G.vertexnum);
+        if (level == 6)
+            break;
     }
-    for (v = 1; v <= G.vertexnum; v++)
-        if (visited[v] == 1)
-            visitsum += 1;
-
-    return visitsum / G.vertexnum;
+    return (float)count / G.vertexnum;
 }
+
 int main()
 {
     int vertex1, vertex2;
@@ -169,7 +154,74 @@ int main()
         ALGraphStorage(G, vertex2, vertex1); //以vertex2为第一节点进行存储
     }
     /*对每个结点进行广度优先遍历，并求解距离小于等于6的结点数占比*/
-    for (int i = 1; i <= G.edgenum; i++) //遍历次数为边数
-        printf("%.2f%%\n", BFSTraverse(G, G.vertices[i].vertex) * 100);
+    for (int i = 1; i <= G.vertexnum; i++) //遍历次数为边数
+        printf("%d: %.2f%%\n", G.vertices[i].vertex, BFSTraverse(G, G.vertices[i].vertex) * 100);
     return 0;
 }
+
+/*
+10 9
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7
+7 8
+8 9
+9 10
+
+10 8
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7
+7 8
+9 10
+
+11 10
+1 2
+1 3
+1 4
+4 5
+6 5
+6 7
+6 8
+8 9
+8 10
+10 11
+*/
+
+/*
+int FirstAdjvex(ALGraph G, int u) //求第一个边表结点序号
+{
+    return G.vertices[u].firstedge->adjvertex;
+}
+int NextAdjvex(ALGraph G, int u, int w) //求下一个边表结点序号
+{
+    struct EdgeNode *p = (struct EdgeNode *)malloc(sizeof(struct EdgeNode));
+    p = G.vertices[u].firstedge; //从u结点开始遍历
+    while (p->nextedge)          //p结点不空
+    {
+        if (p->adjvertex != w) //找到w结点
+            p = p->nextedge;
+    }
+    if (p->nextedge) //p的下一结点不空返回w结点的下一元素
+        return p->nextedge->adjvertex;
+    else //否则返回0
+        return 0;
+}
+*/
+/*
+    for (w = FirstAdjvex(G, u); w != 0; w = NextAdjvex(G, u, w))
+    {
+        printf("test3\n");
+        if (!visited[w])
+        {
+            visited[w] = 1;
+            EnQueue(Q, w); //  访问的顶点w入队列
+        }
+    }
+*/
