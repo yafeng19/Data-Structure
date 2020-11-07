@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define MAX_NUM 105
 
 typedef struct QNode
@@ -108,9 +109,8 @@ float BFSTraverse(ALGraph G, int vertex) //广度优先遍历
     int last = vertex;    //记录每一层最后遍历的元素
     int tail;             //记录上次遍历的元素
     struct EdgeNode *p = (struct EdgeNode *)malloc(sizeof(struct EdgeNode));
-    Queue Q; //定义辅助队列
-    for (v = 0; v <= G.vertexnum; v++)
-        visited[v] = 0; //初始化访问标志
+    Queue Q;                             //定义辅助队列
+    memset(visited, 0, sizeof(visited)); //初始化访问标志为0
     InitQueue(Q);
     visited[vertex] = 1;
     EnQueue(Q, vertex); //将最初广度优先遍历结点入队
