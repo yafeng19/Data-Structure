@@ -1,8 +1,8 @@
 /**
  * 实验4 基于词频的文件相似度
+ * 哈希表倒排索引法
  * 2020-11-14
  */
-
 #include <iostream>
 #include <iomanip>
 #include <string.h>
@@ -12,18 +12,20 @@
 #include <sstream>
 using namespace std;
 
-typedef struct
+typedef struct wordblock
 {
-    char word[11]; //存储单词字符串，长度不超过10
-    int wordLen;   //记录单词长度
-} ElemType;
-typedef struct
+    char *word;
+    int wordLen;
+    struct wordBlock *next;
+} WordBlock;
+typedef struct hash
 {
-    ElemType elem[100]; //静态查找表存储一个文件中的有效单词，假设长度不超过100
-    int length;         //静态查找表的长度
-} SSTable;
+    WordBlock *wordsList;
+    int wordNum;
+    int tableLen;
+} HashTable;
 
-void readFiles(SSTable &file)
+void readFiles(HashTable &file)
 {
     string line;
     getline(cin, line, '#'); //读入一行文字，遇到#则结束
@@ -36,7 +38,7 @@ void readFiles(SSTable &file)
         {
             while (isalpha(line.at(i))) //判断是否为字母
             {
-                file.elem[j].word[k] = (char)tolower(line.at(i)); //全部转成小写字母，便于后续比较
+                file.wordsList[j].word[k] = (char)tolower(line.at(i)); //全部转成小写字母，便于后续比较
                 len++;
                 k++;
                 i++;
@@ -49,29 +51,30 @@ void readFiles(SSTable &file)
             }
             if (len != 1 && len != 2)
             { //只有长度不等于1或2的单词才能存储，进入下一个单词存储空间
-                file.elem[j].wordLen = len;
+                file.wordsList[j].wordLen = len;
                 j++;
             }
         }
         else //该位为非字母，直接向后遍历
             i++;
     }
-    file.length = j - 1;
+    file.wordNum = j - 1;
     /*
     //测试输出一个句子中存储的有效单词
-    cout << file.length<<endl;
+    cout << file.wordNum<<endl;
     for (int t = 1; t <= j - 1; t++)
-        cout << file.elem[t].word << " ";
+        cout << file.wordsList[t].word << " ";
     */
 }
-int findSame(SSTable file)
+
+int findSame(HashTable file)
 {
     int sameNum = 0; //记录一个文件本身重复的单词次数
-    for (int i = file.length; i > 0; i--)
+    for (int i = file.wordNum; i > 0; i--)
     {
-        strcpy(file.elem[0].word, file.elem[i].word); //0号位置作为监视哨
+        strcpy(file.wordsList[0].word, file.wordsList[i].word); //0号位置作为监视哨
         for (int j = i - 1; j > 0; j--)
-            if (strcmp(file.elem[j].word, file.elem[0].word) == 0)
+            if (strcmp(file.wordsList[j].word, file.wordsList[0].word) == 0)
             { //如果word字符串相同
                 sameNum++;
                 break; //第一次遇到重复字符串则跳出
@@ -79,7 +82,7 @@ int findSame(SSTable file)
     }
     return sameNum;
 }
-float compareFiles(SSTable file1, SSTable file2)
+float compareFiles(HashTable file1, HashTable file2)
 {
     /*same1为第一个文件里的相似次数，same2为第二个文件里的相似次数 
     same为两个文件里的共同相似次数*/
@@ -87,25 +90,24 @@ float compareFiles(SSTable file1, SSTable file2)
     same1 = findSame(file1);
     same2 = findSame(file2);
 
-    SSTable file;
+    HashTable file;
     /*将file1和file2合并得到file*/
-    file.length = file1.length + file2.length;
+    file.wordNum = file1.wordNum + file2.wordNum;
     int num = 1;
-    for (int i = 1; i <= file1.length; i++, num++)
-        file.elem[num] = file1.elem[i];
-    for (int j = 1; j <= file2.length; j++, num++)
-        file.elem[num] = file2.elem[j];
+    for (int i = 1; i <= file1.wordNum; i++, num++)
+        file.wordsList[num] = file1.wordsList[i];
+    for (int j = 1; j <= file2.wordNum; j++, num++)
+        file.wordsList[num] = file2.wordsList[j];
     same = findSame(file);
-    return (float)(same - same1 - same2) / (file.length - same);
+    return (float)(same - same1 - same2) / (file.wordNum - same);
 }
-
 int main()
 {
     int fileNum;
     int compareNum;
     //cout << "请输入文件数目：" << endl;
     cin >> fileNum;
-    SSTable *fileList = (SSTable *)malloc(sizeof(SSTable) * fileNum);
+    HashTable *fileList = (HashTable *)malloc(sizeof(HashTable) * fileNum);
     for (int n = 0; n < fileNum; n++)
     {
         //cout << "请输入文件内容" << endl;
@@ -120,7 +122,6 @@ int main()
         cout << fixed << setprecision(1) << compareFiles(fileList[file1 - 1], fileList[file2 - 1]) * 100 << "%" << endl;
     }
 }
-
 /*
 3
 Aaa Bbb Ccc
