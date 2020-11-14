@@ -1,6 +1,6 @@
 /**
  * 实验4 基于词频的文件相似度
- * 哈希表倒排索引法
+ * 哈希表倒排索引查找
  * 2020-11-14
  */
 #include <iostream>
@@ -122,6 +122,7 @@ int main()
         cout << fixed << setprecision(1) << compareFiles(fileList[file1 - 1], fileList[file2 - 1]) * 100 << "%" << endl;
     }
 }
+
 /*
 3
 Aaa Bbb Ccc
