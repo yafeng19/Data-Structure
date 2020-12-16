@@ -86,7 +86,7 @@ bool Top(LinkStack S, double &e)
 
 void traverse(char formula[]) //格式化表达式，均化成二元运算的形式
 {
-    for (int i = strlen(formula) - 1; i >= 0; i--)
+    for (int i = strlen(formula) - 1; i > 0; i--)
         if (formula[i] == '-' && formula[i - 1] == '(')
         {
             formula[strlen(formula) + 1] = '\0';
@@ -94,6 +94,13 @@ void traverse(char formula[]) //格式化表达式，均化成二元运算的形
                 formula[j] = formula[j - 1];
             formula[i] = '0'; //(-a)的情况转化为(0-a)
         }
+    if (formula[0] == '-')
+    {
+        formula[strlen(formula) + 1] = '\0';
+        for (int j = strlen(formula); j > 0; j--)
+            formula[j] = formula[j - 1];
+        formula[0] = '0'; //-a的情况转化为 0-a
+    }
 }
 
 //由原表达式建立表达式二叉树，lpos和rpos分别代表遍历起止位置
