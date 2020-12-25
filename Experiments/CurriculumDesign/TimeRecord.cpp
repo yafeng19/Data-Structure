@@ -1,10 +1,5 @@
-/**
- * 2020-12-11
- * 数据结构课设
- * 核心算法：利用二叉树和栈求解表达式
- */
-
 #include <iostream>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -162,24 +157,6 @@ void buildTree(BiTree &T, char formula[], int lpos, int rpos)
     buildTree(T->rchild, formula, pAS + 1, rpos);
 }
 
-void print_tree(BiTree t, int n) //凹入法打印二叉树
-{
-    if (t == NULL)
-        return;
-    print_tree(t->rchild, n + 1);
-    for (int i = 0; i < n - 1; i++)
-        cout << "      ";
-    if (n > 0)
-    {
-        cout << "$$$";
-        if (t->op == operand)
-            cout << t->optd << endl;
-        else
-            cout << t->optr << endl;
-    }
-    print_tree(t->lchild, n + 1);
-}
-
 bool SuffixOrder(BiTree T, LinkStack S) //后序遍历表达式二叉树并进行运算，返回值为false代表出现除零操作
 {
     if (T) //非空树，即非叶子结点的左右子树
@@ -258,12 +235,14 @@ bool SuffixOrder(BiTree T, LinkStack S) //后序遍历表达式二叉树并进�
 int main()
 {
     char formula[1000];
+    clock_t start, stop; /* clock_t 是clock()型 函数返回的变量类型 */
+    double duration;     /* 位 记录被测函数运行时间，以秒为单位 */
     cin >> formula;
+    start = clock(); /* 时 开始计时 */
     BiTNode *T = NULL;
     traverse(formula);
-    cout << formula;
+    cout << endl;
     buildTree(T, formula, 0, strlen(formula));
-    print_tree(T, strlen(formula));
     LinkStack S; //操作数辅助栈
     InitStack(S);
     bool zflag = SuffixOrder(T, S); //若zflag为false则出现除零操作
@@ -273,7 +252,10 @@ int main()
     {
         double result;
         Pop(S, result);
-        cout << result << endl;
+        cout << "运算结果为：" << result << endl;
     }
+    stop = clock();                                /* 时 停止计时 */
+    duration = ((double)(stop - start)) / CLK_TCK; /* 间 计算运行时间 */
+    printf("核心算法运行时间为%lf秒", duration);
     return 0;
 }
